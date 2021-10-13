@@ -1,0 +1,18 @@
+<ion-slides
+  class="slides" #profileImages
+  (ionSlideDidChange)="onSlideChange()"
+  (ionSlideReachStart)="onReachStart()"
+  (ionSlideReachEnd)="onReachEnd()">
+    <ion-slide  *ngFor="let item of images">
+      <div class="slide-img background-img" [style.backgroundImage]="'url(' + item.url + ')'"></div>
+    </ion-slide>
+</ion-slides>
+
+<div class="custom-pagination">
+  <div *ngFor="let bullet of images; let i = index" class="pagination-bullet" [ngClass]="{'pagination-bullet-active': activeIndex === i}"></div>
+</div>
+
+<div class="overlay-navigation" *ngIf="isClickable">
+  <div class="navi navi-left" (click)="moveSlide(-1)"></div>
+  <div class="navi navi-right" (click)="moveSlide(1)"></div>
+</div>
