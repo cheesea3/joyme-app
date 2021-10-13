@@ -27,7 +27,7 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
     public username: object;
     public ref: AngularFireStorageReference;
     public highlights = {
-        lastKey: '0',
+        lastKey: undefined,
         finishLoad: false,
     };
     public favorites = {
@@ -477,10 +477,8 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
                 query = query.where('gender', 'in', filterData.preferences);
             }
 
-
             if (filterData?.online) {
-                if (this.highlights.lastKey !== '0') {
-                    console.log(this.highlights.lastKey);
+                if (this.highlights.lastKey) {
                     query = query.orderBy('lastTimeActive', 'desc')
                         .startAfter((this.highlights.lastKey as any).lastTimeActive || 0)
                         .limit(10);
@@ -499,7 +497,8 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
             .valueChanges()
             .pipe(
                 map((results: any) => {
-           
+
+
                    /* if (filterData?.withPhoto) {
 
                         if ((+results[results.length - 1].id === this.highlights.lastKey.id) || isNaN(this.highlights.lastKey)) {
@@ -511,18 +510,14 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
 
                     }*/
                     if (filterData?.online) {
-                       // console.log((+results[results.length - 1]?.lastTimeActive === this.highlights.lastKey) || isNaN(this.highlights.lastKey))
-                        if ((+results[results.length - 1]?.id === (this.highlights.lastKey as any).id) /*|| isNaN(this.highlights.lastKey)*/) {
+                        if ((results[results.length - 1]?.id === (this.highlights.lastKey as any)?.id) /*|| isNaN(this.highlights.lastKey)*/) {
                             this.highlights.finishLoad = true;
                             return [];
                         }
-
-                        //this.highlights.lastKey = results[results.length - 1]?.lastTimeActive;
                         this.highlights.lastKey = results[results.length - 1];
                     }
 
-
-                    if (typeof this.highlights.lastKey === 'undefined') {
+                    if (!this.highlights.lastKey) {
                         this.highlights.finishLoad = true;
                     }
 
@@ -560,6 +555,7 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
                             return;
                         });
                     }*/
+
                     return results.length > 0 ? results.filter(user => user && user.id !== this.user.id) : [];
                 }),
                 take(5)

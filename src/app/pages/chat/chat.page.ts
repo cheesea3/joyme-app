@@ -82,13 +82,15 @@ export class ChatPage implements OnInit {
                     message.time = DateHelper.getCurrentTime(message.createdAt);
                     const date = DateHelper.formatMovementDate(message.createdAt, 'he-IL');
                     message.date = date;
-                    if (i === 0 || (i > 0 && message.date !== chat.messages[i - 1].date)) {
+
+                    if (i === 0 || (i > 0 && (message.date !== chat.messages[i - 1].date))) {
                         message.date = date;
                     } else {
-                        message.date = '';
+                       message.date = '';
+                       //message.date = date;
                     }
                     return message;
-                });
+                })
             }
             this.scrollToBottom(null, true);
         });

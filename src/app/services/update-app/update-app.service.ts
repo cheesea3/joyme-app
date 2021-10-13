@@ -28,7 +28,6 @@ export class UpdateAppService {
     this.http.get<any>(this.API_URL).pipe(map(res => {
       return res[0].versionUpdate;
     })).subscribe(async (info: UpdateApp) => {
-      console.log(info);
       if(!info.enabled) {
         this.presentAlert(info.msg.title, info.msg.msg);
       }else{

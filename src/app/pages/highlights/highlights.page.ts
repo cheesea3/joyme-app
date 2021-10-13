@@ -17,9 +17,9 @@ import {ProfilePage} from '../profile/profile.page';
     styleUrls: ['./highlights.page.scss'],
 })
 export class HighlightsPage implements OnInit, OnDestroy {
-    @ViewChild(IonContent) content: IonContent;
     @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
     @ViewChild('header') header: any;
+    @ViewChild(IonContent, {static: false}) content: IonContent;
 
     paginator: PaginatorState;
     sorting: SortState;
@@ -128,15 +128,17 @@ export class HighlightsPage implements OnInit, OnDestroy {
         modal.onDidDismiss()
             .then((res) => {
                 if (res.data) {
-                    this.filterData = {...this.filterData, ...res.data};
-                    this.filter();
+                    this.content.scrollToTop().then(_ => {
+                        this.filterData = {...this.filterData, ...res.data};
+                        this.filter();
+                    });
                 }
             });
         return await modal.present();
     }
 
     filter() {
-        this.userService.highlights.lastKey = '0';
+        this.userService.highlights.lastKey = undefined;
         this.userService.highlights.finishLoad = false;
         this.filterService.set(this.filterData);
         this.users = [];
@@ -156,8 +158,8 @@ export class HighlightsPage implements OnInit, OnDestroy {
         setTimeout(_ => {
             event.target.complete().then(_ => {
                 this.getHighlights().subscribe(users => {
-                    console.log('loadData');
-                    console.log(users);
+                    //console.log('loadData');
+                    //console.log(users);
                     users.forEach(user => this.users.push(user));
                 });
             });
