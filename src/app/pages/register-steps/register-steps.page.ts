@@ -10,7 +10,6 @@ import {AuthService} from '../../services/auth/auth.service';
 import {Router} from '@angular/router';
 import {UniqueUsernameValidator} from '../../validators/unique-username.validator';
 import {PhotosPage} from '../photos/photos.page';
-import {SettingsModel} from '../../models/settings.model';
 import {BirthdayValidator} from '../../validators/birthday.validator';
 
 @Component({
@@ -46,13 +45,11 @@ export class RegisterStepsPage implements OnInit {
     private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
     constructor(
-        private selectService: SelectService,
         private navCtrl: NavController,
         private loadingCtrl: LoadingController,
         private fb: FormBuilder,
         public userService: UserService,
         private authService: AuthService,
-        private router: Router,
         public toastController: ToastController,
         private modalCtrl: ModalController,
         private uniqueUsernameValidator: UniqueUsernameValidator,
@@ -209,7 +206,7 @@ export class RegisterStepsPage implements OnInit {
 
             Object.keys(this.f).reverse().forEach(key => {
                 if (this.f[key].errors?.required || this.f[key].errors?.email) {
-                    errorMessage = 'שדה "' + errorFields[key] + '"' + ' לא תקינה ';
+                    errorMessage = 'שדה "' + errorFields[key] + '"' + ' לא תקינ ';
                 }
 
                 if (this.f[key].errors?.minlength) {
@@ -277,8 +274,6 @@ export class RegisterStepsPage implements OnInit {
 
                 if (this.user) {
                     this.authService.login(this.user);
-                    // this.userService.(this.authService.getUserByToken());
-                    // this.userService.user =
                     setTimeout(() => {
                         loading.dismiss();
                         this.photosProfile();

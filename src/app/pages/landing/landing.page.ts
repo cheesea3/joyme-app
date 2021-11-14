@@ -97,12 +97,10 @@ export class LandingPage implements OnInit {
     logIn(phoneForm: FormGroup) {
         const appVerifier = this.windowRef.recaptchaVerifier;
         const phoneNumber = '+972' + phoneForm.value.phone;
-        console.log(phoneNumber);
         this.loadingSpinner = true;
         this.authService.loginPhone(phoneNumber, appVerifier).then(res => {
             this.windowRef.confirmationResult = res;
             this.showCodeFormStatus = 2;
-
         }).catch(err => {
             if (err.code === 'auth/invalid-phone-number') {
                 this.errorMessage = 'מספר טלפון לא תקין';
@@ -116,7 +114,6 @@ export class LandingPage implements OnInit {
 
     verifyCode(codeForm: FormGroup) {
         let code: string = codeForm.value.code.toString().trim();
-
 
         if (typeof code === 'string') {
 

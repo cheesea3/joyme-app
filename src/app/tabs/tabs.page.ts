@@ -22,6 +22,7 @@ export class TabsPage implements OnInit {
         public userService: UserService,
         public counterService: CounterService,
     ) {
+        
     }
 
     ngOnInit(): void {

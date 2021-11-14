@@ -27,7 +27,6 @@ export class AppComponent {
         public userService: UserService,
         public updateAppService: UpdateAppService
        // private ngZone: NgZone,
-
     ) {
         this.initializeApp();
     }
@@ -39,13 +38,16 @@ export class AppComponent {
 
     async initializeApp() {
         const user = await this.authService.getUserByToken().pipe().toPromise();
-        this.userService.setUser(user);
+       // this.userService.setUser(user);
+       // alert(this.userService.user.id);
+
         this.platform.ready().then(() => {
-            this.updateAppService.checkForUpdate();
+            if(this.platform.is('android') || this.platform.is('ios')) {
+                this.updateAppService.checkForUpdate();
+            }
             this.statusBar.styleDefault();
             this.themeService.toggleDarkMode(true);
             this.splashScreen.hide();
-
 
             /*Network.addListener('networkStatusChange', (status) => {
                 this.ngZone.run(() => {
@@ -54,7 +56,6 @@ export class AppComponent {
                     console.log(this.networkStatus);
                 });
             });*/
-
         });
         // this.themeService.restore();
         this.themeService.toggleDarkMode(true);

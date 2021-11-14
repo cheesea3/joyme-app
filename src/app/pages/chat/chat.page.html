@@ -22,17 +22,17 @@
         <ion-text color="medium">YOU MATCHED WITH TINDIE ON 14/11/2019</ion-text>
     </div>-->
     <div class="chat-list">
-
+      
         <div class="no-results" *ngIf="blockedMessage">
             {{blockedMessage}}
         </div>
         <ng-container *ngIf="chat$ | async as chat">
             <div class="chat-item" *ngFor="let item of chat.messages; trackBy: trackByCreated; index as i"
                  [ngClass]="{'chat-item-outgoing': item.uid !== userService.user.id}">
-                <div class="chat-timestamp center">
+                <div *ngIf="item.imageRequest === false" class="chat-timestamp center">
                     <strong>{{item?.date}}</strong>
                 </div>
-                <div class="chat-item-inner">
+                <div *ngIf="item.imageRequest === false" class="chat-item-inner">
                     <!--<div class="chat-avatar" *ngIf="item.uid !== userService.user.id">
                         <img [src]="item.avatar">
                     </div>-->

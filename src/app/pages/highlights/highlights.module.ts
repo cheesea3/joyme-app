@@ -9,6 +9,7 @@ import { HighlightsPageRoutingModule } from './highlights-routing.module';
 import { HighlightsPage } from './highlights.page';
 import { SharedModule } from '../../components/sharedModule';
 import {SharedDirectiveModule} from '../../directives/shared-directive.module';
+import { RippleLoaderComponent } from 'src/app/components/ripple-loader/ripple-loader.component';
 
 @NgModule({
   imports: [
@@ -19,6 +20,6 @@ import {SharedDirectiveModule} from '../../directives/shared-directive.module';
     SharedModule,
     SharedDirectiveModule,
   ],
-  declarations: [HighlightsPage]
+  declarations: [HighlightsPage,RippleLoaderComponent]
 })
 export class HighlightsPageModule {}

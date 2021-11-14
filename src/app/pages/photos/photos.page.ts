@@ -30,11 +30,12 @@ export class PhotosPage implements OnInit {
     public showCropper = false;
     public imgLoaded = false;
     public uploadProgress;
+    public isPrivateSelectedImage: boolean = false
     public ref: AngularFireStorageReference;
     public task: AngularFireUploadTask;
     public imagePickerOptions = {
         maximumImagesCount: 1,
-        quality: 50
+        quality: 70
     };
     public masks = [
         'https://firebasestorage.googleapis.com/v0/b/joyme-19532.appspot.com/o/masks%2F1_600x600.png?alt=media&token=5f4c1804-aa4f-472e-aa84-a2e443bd032e',
@@ -51,6 +52,8 @@ export class PhotosPage implements OnInit {
     public segment = 1;
     public blur = 10;
     public newUser: boolean = false;
+    public privatePhotos = [];
+    public publicPhotos = [];
 
     constructor(
         public modalCtrl: ModalController,
@@ -70,6 +73,8 @@ export class PhotosPage implements OnInit {
     ngOnInit() {
         this.newUser = localStorage.getItem('newUser') === 'true';
         this.userService.getUser();
+        this.privatePhotos = this.userService.user.photos.filter(photo => photo.isPrivate);
+        this.publicPhotos = this.userService.user.photos.filter(photo => !photo.isPrivate);
     }
 
     async presentToast(message) {
@@ -209,7 +214,6 @@ export class PhotosPage implements OnInit {
             contentType: 'image/jpeg'
         });
 
-
         // AngularFireUploadTask provides observable
         // to get uploadProgress value
         this.uploadProgress = this.task.snapshotChanges()
@@ -223,24 +227,24 @@ export class PhotosPage implements OnInit {
 
                 const photos = this.userService.user.photos;
                 const mainPhoto = photos.filter(el => el.main === true);
-                photos.push({status: 0, id: randomId, main: mainPhoto.length !== 1, url: randomId});
+                let newImage = {status: 0, id: randomId, main: mainPhoto.length !== 1, url: randomId, isPrivate: this.isPrivateSelectedImage}
+                photos.push(newImage);
 
-                /*// save photo src to database
-                const photo = {
-                    id: this.userService.user.id,
-                    photos
-                };*/
-
+                this.isPrivateSelectedImage ?
+                    this.privatePhotos.push(newImage): this.publicPhotos.push(newImage)
+       
                 this.userService.user.photos = photos;
 
                 this.userService.user.allPhotosApproved = this.userService.allPhotosApproved();
 
-                this.userService.update(this.userService.user).subscribe(result => {
-                    this.uploadingProcess = false;
-                    setTimeout(_ => {
+                this.userService.update(this.userService.user).subscribe(() => {},
+                err => console.log(err),
+                () => {
+                    setTimeout(() =>{
+                        this.uploadingProcess = false;
                         this.userService.user.photos = photos;
                         this.cancelUpload();
-                    }, 1900);
+                    },900)
                 });
 
                 // this.downloadURL = this.ref.getDownloadURL();
@@ -325,7 +329,14 @@ export class PhotosPage implements OnInit {
             }, {
                 text: 'כן, מחק',
                 handler: () => {
-                    this.userService.deletePhoto(photo);
+                     this.privatePhotos = this.userService.user.photos.filter(photoEl => {
+                         return photoEl.id !== photo.id && photoEl.isPrivate;
+                     });
+                     this.publicPhotos = this.userService.user.photos.filter(photoEl => {
+                         return photoEl.id !== photo.id && !photoEl.isPrivate;
+                     });
+
+                     this.userService.deletePhoto(photo);
                 }
             }]
         });
@@ -336,16 +347,15 @@ export class PhotosPage implements OnInit {
         console.log('onDidDismiss resolved with role', role);
     }
 
-    async selectImage(event, addNew = false, photo: any = '') {
+    async selectImage(event, addNew = false, photo: any = '', isPrivate: boolean = false) {
 
+        this.isPrivateSelectedImage = isPrivate;
 
         if (event.target.classList.contains('select-image')) {
             //  image upload
             /*const element: HTMLElement = document.querySelector('input[type=file]') as HTMLElement;
             element.click();*/
-
             if (addNew) {
-
                 const actionSheet = await this.actionSheetController.create({
                     header: 'העלאת תמונה מ...',
                     buttons: [{
@@ -378,7 +388,6 @@ export class PhotosPage implements OnInit {
                             this.delete(photo);
                         }
                     },
-
                         {
                             text: 'מצלמה',
                             handler: () => {
@@ -392,24 +401,18 @@ export class PhotosPage implements OnInit {
                     ]
                 };
 
-                console.log(buttonOptions);
-                console.log(photo);
-                if (photo.status === 1 && photo.main === false) {
+                if (photo.status === 1 && photo.main === false && photo.isPrivate === false) {
                     buttonOptions.buttons.push({
-                        text: 'set as main',
+                        text: 'לעשות כתמונה הראשית',
                         handler: () => {
                             this.setAsMain(photo);
                         }
                     })
                 }
-
                 const actionSheet = await this.actionSheetController.create(buttonOptions);
-
                 await actionSheet.present();
-
             }
         }
-
     }
 
     setAsMain(photo) {

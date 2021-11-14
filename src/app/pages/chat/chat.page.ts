@@ -1,14 +1,14 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {IonContent, ModalController, NavParams, ToastController} from '@ionic/angular';
+import {AlertController, IonContent, ModalController, NavParams, ToastController} from '@ionic/angular';
 import {Observable, Subscription} from 'rxjs';
 import {ChatService} from '../../services/chat/chat.service';
-import {ActivatedRoute} from '@angular/router';
 import {UserModel} from '../../models/user.model';
 import {UserService} from '../../services/user/user.service';
 import {DateHelper} from '../../helpers/date.helper';
 import {CounterService} from '../../services/counter/counter.service';
 import {FcmService} from '../../services/fcm/fcm.service';
 import {ProfilePage} from '../profile/profile.page';
+import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'app-chat',
@@ -24,6 +24,7 @@ export class ChatPage implements OnInit {
     chatId: string;
     messages: any[];
     typingMessage = '';
+    imageRequestMessage = [];
     interlocutorId = '';
     blockedMessage = '';
     showGiphy = false;
@@ -34,9 +35,9 @@ export class ChatPage implements OnInit {
     constructor(
         public chatService: ChatService,
         public userService: UserService,
-        private route: ActivatedRoute,
         public counterService: CounterService,
         private modalCtrl: ModalController,
+        private alertController: AlertController,
         public toastController: ToastController,
         public fcmService: FcmService,
         public navParams: NavParams,
@@ -58,11 +59,58 @@ export class ChatPage implements OnInit {
     }
 
     ionViewDidLeave() {
+        console.log('ionViewDidLeave');
         this.subscription.unsubscribe();
     }
 
     getListData(type, userId) {
         return this.userService.getListData(type, userId);
+    }
+
+    async imageConfirmation() {
+        let pushData = {};
+        const alert = await this.alertController.create({
+            header: 'אישור תמונה פרטית',
+            message: 'האם תרצה לתת אפשרות לראות את התמונות הפרטיות שלך?',
+            backdropDismiss:false,
+            buttons: [{
+                text: 'לא',
+                role: 'cancel',
+                handler: () => {
+                     pushData = {
+                         title: 'JoyMe', 
+                         body: 'בקשת התמונה נדחתה ❌', 
+                         page: 'tabs/highlights', 
+                         modal: true,
+                         receiver: this.chatService.interlocutor,
+                         sender: this.userService.user
+                        };
+                    this.fcmService.sendPushMessage(pushData);
+                    this.chat$.pipe(take(1)).subscribe(chat => {
+                    this.chatService.removeImageRequestMessage(chat, this.chatId);
+                    });
+                    this.userService.setList('requestImage',this.userService.user.id,this.chatService.interlocutor.id).subscribe()
+                }
+            }, {
+                text: 'כן',
+                handler: () => {
+                     pushData = {
+                         title: 'JoyMe', 
+                         body: 'בקשת התמונה התקבלה ✅', 
+                         page: 'tabs/highlights',
+                         modal: true,
+                         receiver: this.chatService.interlocutor,
+                         sender: this.userService.user
+                        };
+                     this.fcmService.sendPushMessage(pushData);
+                     this.userService.updateList('requestImage', this.userService.user.id,this.chatService.interlocutor.id,true).subscribe();
+                     this.chat$.pipe(take(1)).subscribe(chat => {
+                        this.chatService.removeImageRequestMessage(chat, this.chatId);
+                    });
+                }
+            }]
+        });
+        await alert.present();
     }
 
     getDialogue() {
@@ -76,19 +124,23 @@ export class ChatPage implements OnInit {
             this.fcmService.getOptionsByUserId(this.interlocutorId);
 
             if (chat.messages.length > 0) {
+                this.imageRequestMessage = chat.messages.filter(msg => msg.imageRequest && !msg.delivered && this.userService.user.id !== msg.uid);
+
+                if(this.imageRequestMessage.length !== 0) {
+                    this.imageRequestMessage = [];
+                    this.imageConfirmation();
+                }
+
                 this.chatService.setMessagesAsReceived(chat, this.userService.user, this.chatId);
                 this.counterService.setByUserId(this.userService.user.id, 0, 'newMessages');
+
                 chat.messages.map((message, i) => {
                     message.time = DateHelper.getCurrentTime(message.createdAt);
                     const date = DateHelper.formatMovementDate(message.createdAt, 'he-IL');
                     message.date = date;
 
-                    if (i === 0 || (i > 0 && (message.date !== chat.messages[i - 1].date))) {
-                        message.date = date;
-                    } else {
-                       message.date = '';
-                       //message.date = date;
-                    }
+                    message.date =  (i === 0 || (i > 0 && (message.date !== chat.messages[i - 1].date))) ? date : '';
+                    
                     return message;
                 })
             }
@@ -122,7 +174,6 @@ export class ChatPage implements OnInit {
                 }
             });
         });
-
         this.userService.getUser();
     }
 
@@ -140,7 +191,7 @@ export class ChatPage implements OnInit {
                 });
             }
 
-            const pushData = {title: 'JoyMe', body: 'קיבלת הודעה חדשה', receiver_id: this.chatService.interlocutor.id};
+            const pushData = {title: 'JoyMe', body: 'קיבלת הודעה חדשה', page: 'tabs/matches', modal: false, sender: this.userService.user, receiver: this.chatService.interlocutor};
 
             // Sending push only to active users
             if (this.chatService.interlocutor.status === 1) {

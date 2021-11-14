@@ -77,13 +77,14 @@ export class ChatService extends TableService<UserModel> {
         return ArrayHelper.valuesComparison(user1, user2);
     }
 
-    async sendMessage(chatId, content, userId): Promise<any> {
+    async sendMessage(chatId: string, content: string, userId: string, imageRequest: boolean = false): Promise<any> {
 
         const message = {
             uid: userId,
             createdAt: Date.now(),
             delivered: false,
             content,
+            imageRequest,
         };
 
         const data = {
@@ -117,6 +118,15 @@ export class ChatService extends TableService<UserModel> {
                 .doc(chatId)
                 .set({messages: result}, {merge: true});
         }
+    }
+
+    removeImageRequestMessage(messages, chatId) {
+
+        const result = messages.messages.filter(message => !message.imageRequest);
+
+        this.db.collection('chats')
+        .doc(chatId)
+        .set({messages: result}, {merge: true});
     }
 
     joinUsers(chat$: Observable<any>) {

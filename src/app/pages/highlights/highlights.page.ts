@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {UserService} from '../../services/user/user.service';
 import {GroupingState, PaginatorState, SortState} from '../../crud-table';
 import {FormBuilder} from '@angular/forms';
@@ -10,6 +10,8 @@ import {UserModel} from '../../models/user.model';
 import {FilterService} from '../../services/filter/filter.service';
 import {PhotosPage} from '../photos/photos.page';
 import {ProfilePage} from '../profile/profile.page';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'app-highlights',
@@ -24,7 +26,7 @@ export class HighlightsPage implements OnInit, OnDestroy {
     paginator: PaginatorState;
     sorting: SortState;
     grouping: GroupingState;
-    isLoading: boolean;
+    isLoading = true;
     user: UserModel;
     // store last document
     users = [];
@@ -46,6 +48,7 @@ export class HighlightsPage implements OnInit, OnDestroy {
     constructor(
         public userService: UserService,
         private fb: FormBuilder,
+        private authService: AuthService,
         private modalCtrl: ModalController,
         public navCtrl: NavController,
         public fcmService: FcmService,
@@ -57,16 +60,24 @@ export class HighlightsPage implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+
         this.filterData = this.filterService.get(this.filterData);
-        this.getHighlights().subscribe(users => {
-            users.forEach(user => this.users.push(user));
-        });
+    
+        setTimeout(_ => {
+            this.fcmService.initPush();
+            this.userService.setOnline();
+
+            this.loadHighlights().subscribe(users => {
+                this.isLoading = false;
+                users.forEach((user: any) => this.users.push(user));
+            });
+        },5000);
     }
 
     checkIfFrozenAcc() {
         if (this.userService.user.status === 4) {
             // activate
-            this.userService.user.status = 1;
+            this .userService.user.status = 1;
             this.userService.update(this.userService.user).subscribe();
         }
     }
@@ -92,10 +103,13 @@ export class HighlightsPage implements OnInit, OnDestroy {
     ionViewWillEnter() {
         // Restore scroll position
         // this.content.scrollToPoint(0, this.scrollPosition);
-        this.fcmService.initPush();
-        this.userService.setOnline();
-        this.hasRejectedPhotos();
-        this.checkIfFrozenAcc();
+            if(this.userService.user) {
+                this.hasRejectedPhotos();
+                this.checkIfFrozenAcc();
+            }else{
+                this.authService.logout();
+            }        
+        
         // this.renderer.setStyle(this.header.el, 'webkitTransition', 'top 700ms');
     }
 
@@ -138,11 +152,12 @@ export class HighlightsPage implements OnInit, OnDestroy {
     }
 
     filter() {
-        this.userService.highlights.lastKey = undefined;
+        //this.userService.highlights.lastKey = this.users[0];
+        this.userService.highlights.lastKey = 0;
         this.userService.highlights.finishLoad = false;
         this.filterService.set(this.filterData);
         this.users = [];
-        this.getHighlights().subscribe(users => {
+        this.loadHighlights().pipe().subscribe(users => {
             users.forEach(user => this.users.push(user));
         });
     }
@@ -157,9 +172,7 @@ export class HighlightsPage implements OnInit, OnDestroy {
     loadData(event) {
         setTimeout(_ => {
             event.target.complete().then(_ => {
-                this.getHighlights().subscribe(users => {
-                    //console.log('loadData');
-                    //console.log(users);
+                this.loadHighlights().subscribe(users => {
                     users.forEach(user => this.users.push(user));
                 });
             });
@@ -182,7 +195,7 @@ export class HighlightsPage implements OnInit, OnDestroy {
         this.subscriptions.forEach((sb) => sb.unsubscribe());
     }
 
-    public getHighlights() {
-        return this.userService.getHighlights(this.filterData);
+    public loadHighlights() {
+        return this.userService.loadHighlights(this.filterData);
     }
 }

@@ -1,9 +1,12 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {IonSlides} from '@ionic/angular';
 import {TapticEngine} from '@ionic-native/taptic-engine/ngx';
 import {AuthService} from '../../services/auth/auth.service';
 import {UserService} from '../../services/user/user.service';
 import {UserModel} from '../../models/user.model';
+import { ChatService } from 'src/app/services/chat/chat.service';
+import { FcmService } from 'src/app/services/fcm/fcm.service';
+import { CounterService } from 'src/app/services/counter/counter.service';
 
 @Component({
     selector: 'profile-image-slides',
@@ -19,12 +22,51 @@ export class ProfileImageSlidesComponent implements OnInit {
     @Output() onNoMoreSlide = new EventEmitter();
     @Output() onChange = new EventEmitter();
     @ViewChild('profileImages', {static: false}) slides: IonSlides;
+    imageRequest = {result: {accepted: false}, empty: true}; 
 
-    constructor(private taptic: TapticEngine, public authService: AuthService, public userService: UserService) {
-    }
+    constructor(
+        private taptic: TapticEngine, 
+        public authService: AuthService, 
+        public userService: UserService, 
+        public fcmService: FcmService, 
+        public counterService: CounterService,
+        public cd: ChangeDetectorRef,
+        public chatService: ChatService) 
+        {}
 
     ngOnInit() {
-        this.images = this.userService.getAllPhotos(this.user, true);        
+        //setTimeout(()=>{
+            this.images = this.userService.getAllPhotos(this.user, true);
+            this.cd.detectChanges();
+        //});
+
+        this.userService.getListData('requestImage',this.user.id).subscribe(res => this.imageRequest = res); 
+        this.checkImageRequest();     
+    }
+
+    sendImageRequest(){
+        this.imageRequest.empty = false;
+        this.userService.setList('requestImage', this.user.id, this.userService.user.id).subscribe(res => {
+            this.chatService.interlocutor = this.user;
+            this.chatService.getDialogue().subscribe(async (res: any) => {
+                this.chatService.sendMessage(res.chat.id, 'בקשה לאישור תמונה', this.userService.user.id, true).then(res => {
+                    // Set counter for unread messages
+                    this.counterService.setByUserId(this.chatService.interlocutor.id, +1, 'newMessages');
+                    const pushData = {title: 'JoyMe', body: 'קיבלת בקשה לאישור תמונות', receiver_id: this.chatService.interlocutor.id};
+                    // Sending push only to active users
+                    if (this.chatService.interlocutor.status === 1) {
+                        this.fcmService.sendPushMessage(pushData);
+                    }
+                });
+            });
+        });
+    }
+
+    checkImageRequest() {
+        this.userService.getListData('requestImage', this.user.id).subscribe(res =>{
+            this.imageRequest.result = res.result[0];
+            this.imageRequest.empty = res.empty;
+        });
     }
 
     onSlideChange() {
@@ -63,5 +105,4 @@ export class ProfileImageSlidesComponent implements OnInit {
     onReachEnd() {
         this.currentEnd = 1;
     }
-
 }

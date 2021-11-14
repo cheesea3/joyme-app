@@ -7,6 +7,7 @@ import {AngularFireAuth} from '@angular/fire/auth';
 import {Router} from '@angular/router';
 import {AuthModel} from '../../models/auth.model';
 import {AngularFirestore} from '@angular/fire/firestore';
+import { UserService } from '../user/user.service';
 
 @Injectable({
     providedIn: 'root'
@@ -22,6 +23,7 @@ export class AuthService implements OnDestroy {
 
     constructor(
         private authHttpService: AuthHTTPService,
+        private userService: UserService,
         private fireAuth: AngularFireAuth,
         private router: Router,
         private afs: AngularFirestore
@@ -69,6 +71,11 @@ export class AuthService implements OnDestroy {
         if (!auth || !auth.accessToken) {
             return of(undefined);
         }
+
+        console.log(auth);
+
+        this.userService.setUser(auth);
+
 
         // this.isLoadingSubject.next(true);
         return this.authHttpService.getUserByToken(auth.accessToken).pipe(

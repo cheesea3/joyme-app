@@ -22,7 +22,7 @@ export class FilterPage implements OnInit {
     public user: UserModel;
     public preferences = [];
     public filterData = {
-        ageRange: {lower: '', upper: ''},
+        ageRange: {lower: 18, upper: 75},
         area: '',
         online: false,
         preferences: [],
@@ -31,12 +31,12 @@ export class FilterPage implements OnInit {
 
     constructor(public modalCtrl: ModalController, private fb: FormBuilder, public filterService: FilterService, public userService: UserService) {
     }
-
     // convenience getter for easy access to form fields
     get f() {
         return this.filterForm.controls;
     }
 
+    
     ngOnInit() {
         this.filterData = this.filterService.get(this.filterData);
         this.filterData.preferences = this.filterData.preferences.length > 0 ? this.filterData.preferences : this.userService.getPreference().value;
@@ -78,8 +78,6 @@ export class FilterPage implements OnInit {
         this.areas[i].chosen = true;
 
         this.f.area.setValue(this.areas[i].value);
-        console.log(this.areas[i].value);
-
     }
 
     submit() {

@@ -11,7 +11,8 @@ export class PersonCardComponent implements OnInit {
 
   constructor(
       public userService: UserService
-  ) { }
+  ) {     
+  }
 
   ngOnInit() {
   }

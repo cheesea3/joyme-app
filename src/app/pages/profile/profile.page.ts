@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ModalController, NavController, NavParams, ToastController} from '@ionic/angular';
 import {UserModel} from '../../models/user.model';
 import {UserService} from '../../services/user/user.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {ReportPage} from '../report/report.page';
 import {ChatService} from '../../services/chat/chat.service';
 import {ChatPage} from '../chat/chat.page';
@@ -26,16 +26,12 @@ export class ProfilePage implements OnInit {
         public navCtrl: NavController,
         public modalCtrl: ModalController,
         public chatModalCtrl: ModalController,
-        private router: Router,
         private route: ActivatedRoute,
         public chatService: ChatService,
         public toastController: ToastController,
         public userService: UserService) {
 
         this.profile = this.navParams.get('profile');
-
-        console.log('Profile: ' + this.profile.id);
-
 
         this.me = this.userService.getUser();
         this.getListData('blockList');

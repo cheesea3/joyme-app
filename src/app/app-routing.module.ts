@@ -1,11 +1,11 @@
 import {NgModule} from '@angular/core';
 import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
-import {canActivate, redirectLoggedInTo, redirectUnauthorizedTo,} from '@angular/fire/auth-guard';
+import {canActivate, redirectLoggedInTo, redirectUnauthorizedTo} from '@angular/fire/auth-guard';
 
 // Send unauthorized  users to login
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['/landing']);
 // Automatically log in users
-const redirectLoggedInToChat = () => redirectLoggedInTo(['/tabs/highlights']);
+const redirectLoggedInToResults = () => redirectLoggedInTo(['/tabs/highlights']);
 
 const routes: Routes = [
     /*{
@@ -24,7 +24,7 @@ const routes: Routes = [
             import('./pages/landing/landing.module').then(
                 (m) => m.LandingPageModule
             ),
-        ...canActivate(redirectLoggedInToChat),
+        ...canActivate(redirectLoggedInToResults),
     },
     {
         path: 'register-steps',

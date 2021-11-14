@@ -12,6 +12,7 @@ import {UserService} from '../user/user.service';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {take} from 'rxjs/operators';
 import {SettingsService} from '../user/settings/settings.service';
+import { ParamsService } from '../params/params.service';
 
 
 @Injectable({
@@ -23,9 +24,8 @@ export class FcmService {
     public options;
 
     constructor(private router: Router, public db: AngularFirestore, public userService: UserService,
-                public http: HttpClient, public settingsService: SettingsService
-    ) {
-    }
+                public http: HttpClient, public settingsService: SettingsService, public paramsService: ParamsService
+    ) {}
 
     public getOptionsByUserId(id) {
         this.settingsService.getByUserId(id).subscribe(
@@ -59,9 +59,8 @@ export class FcmService {
     }
 
     public setToken(id) {
-
-        const time = new Date();
-        time.setDate(time.getDate() - 1);
+        // Minus one day in order to get push today
+        const time = Date.now() - 86400000;
 
         const data = {user_id: this.userService.getId(), token: id, lastTimeUse: time};
 
@@ -75,7 +74,7 @@ export class FcmService {
                 }
             });
         } catch (e) {
-            alert(JSON.stringify(e.message));
+            console.log(JSON.stringify(e.message));
         }
     }
 
@@ -84,26 +83,26 @@ export class FcmService {
     }
 
     sendPushMessage(data) {
-
         try {
             this.data = data;
 
             this.db.collection('push', ref => ref
-                .where('user_id', '==', data.receiver_id))
+                .where('user_id', '==', data.receiver.id))
                 .snapshotChanges().pipe(take(1)).subscribe(changes => {
+
                 changes.map((a: any) => {
                     const id = a.payload.doc.id;
 
                     if (this.frequency(a.payload.doc.data().lastTimeUse) && this.options.push.active && this.options.push.messages) {
                         this.exec(a.payload.doc.data().token);
-                        this.db.collection('push').doc(id).update({
+                        this.db.collection('push').doc(id).set({
                             lastTimeUse: Date.now()
-                        });
+                        },{merge: true});
                     }
                 });
             });
         } catch (e) {
-            console.log(e.message)
+            console.error(e.message)
         }
     }
 
@@ -113,18 +112,21 @@ export class FcmService {
                 title: this.data.title,
                 body: this.data.body,
                 sound: 'default',
-                click_action: 'FCM_PLUGIN_ACTIVITY',
                 icon: 'fcm_push_icon'
             },
             data: {
-                landing_page: 'second',
-                price: '$3,000.00'
+                page: this.data.page,
+                receiver: this.data.receiver || '',
+                sender: this.data.sender || '',
+                modal: this.data.modal
             },
             to: token,
+            message_id: 111,
             // tslint:disable-next-line:max-line-length
             // to: 'fQZM3BqTS52qtsQPRPSvVk:APA91bFnI_2cQ5V9rhRPt2ZKEwKp7LEtuY18eNajfMAJOsecpXDzBdVtW0H07yNQEgLDCDyGZk98D4c176b28x6-uNub29tGFQJM63MRgfjbFt9NdCA-1F9EY8iRYDi_xmgtin7yMH69',
             priority: 'high',
-            restricted_package_name: ''
+            restricted_package_name: '',
+            time_to_live: 600
         };
 
         const httpOptions = {
@@ -136,7 +138,6 @@ export class FcmService {
 
         this.http.post('https://fcm.googleapis.com/fcm/send', newBody, httpOptions).subscribe(res => {
         });
-
     }
 
     private registerPush() {
@@ -173,15 +174,11 @@ export class FcmService {
         PushNotifications.addListener(
             'pushNotificationActionPerformed',
             async (notification: ActionPerformed) => {
-                console.log('Push action performed: ' + JSON.stringify(notification));
-
-                // const data = notification.notification.data;
-                // alert('Push action performed: ' + JSON.stringify(notification));
-                // if (data.detailsId) {
-
-                // alert(JSON.stringify(data.detailsId));
-                //     //this.router.navigateByUrl(`/${data.detailsId}`);
-                // }
+                 const data = notification.notification.data;
+                 data.sender = JSON.parse(data.sender);
+                 this.paramsService.set(data);
+                 
+                this.router.navigateByUrl('/tabs/matches').then(_ => {});
             }
         );
     }

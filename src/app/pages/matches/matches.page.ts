@@ -5,6 +5,8 @@ import {ChatService} from '../../services/chat/chat.service';
 import {Subscription} from 'rxjs';
 import {UserService} from '../../services/user/user.service';
 import {ChatPage} from '../chat/chat.page';
+import { ParamsService } from 'src/app/services/params/params.service';
+import { ProfilePage } from '../profile/profile.page';
 
 @Component({
     selector: 'app-matches',
@@ -25,7 +27,12 @@ export class MatchesPage implements OnInit, OnDestroy {
                 public modalCtrl: ModalController,
                 private routerService: RouterService,
                 public chatService: ChatService,
+                public paramsService: ParamsService,
                 public userService: UserService) {
+                    let params = this.paramsService.getAll();
+                    if(params && params.sender) {
+                        this.viewProfile(params.sender);
+                    }
         this.userService.getUser();
     }
 
@@ -55,6 +62,18 @@ export class MatchesPage implements OnInit, OnDestroy {
                 }
             })
         }, 1000);
+    }
+
+    async viewProfile(profile) {
+        const modal = await this.modalCtrl.create({
+            component: ProfilePage,
+            componentProps: {
+                profile,
+            }
+
+        });
+        return await modal.present();
+        // this.navCtrl.navigateForward(`/profile/${user.id}`, user);
     }
 
     ionViewDidEnter() {

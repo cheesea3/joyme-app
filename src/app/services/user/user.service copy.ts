@@ -156,7 +156,7 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
             this.ref.delete();
             this.ref = this.afStorage.ref('images/' + photo.url + '_600x600');
             this.ref.delete();
-        },err => {console.log(err)});
+        });
         this.subscriptions.push(sb);
     }
 
@@ -327,6 +327,7 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
 
     getMainPhoto(user, dimensions = 's', approved = true) {
 
+
         if (user) {
 
             let photo = user.photos.filter(el => el.main === true);
@@ -337,27 +338,39 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
                 return '../../../assets/media/users/default_' + user.gender + '.png';
             }
 
-            if (photo.status !== 1 && this.user.id !== user.id ) {
-                return '../../../assets/media/users/default_' + user.gender + '.png';
+            // photo = (photo.length > 0) ? photo[0] : {url: './assets/media/users/default.jpg'};
+
+            if (approved) {
+                photo.url = (photo.status === 1) ? photo.id : '../../../assets/media/users/default_' + user.gender + '.png';
+                /*if (photo.status !== 1) {
+                    return photo.url;
+                }*/
             }
+
+
+            // if (photo.status !== 1) {
+            //     return photo.url;
+            // }
 
             let fileName = this.photoParam.baseUrl + photo.url + '_';
 
-            let fileNameWithDimentions = '';
+            console.log(fileName);
 
             if (dimensions === 's') {
-                fileNameWithDimentions = fileName + this.dimensions[dimensions];
+                fileName = fileName + this.dimensions[dimensions];
             }
 
             if (dimensions === 'm') {
-                fileNameWithDimentions = fileName + this.dimensions[dimensions];
+                fileName = fileName + this.dimensions[dimensions];
             }
 
             if (dimensions === 'l') {
-                fileNameWithDimentions = fileName + this.dimensions[dimensions];
+                fileName = fileName + this.dimensions[dimensions];
             }
 
-            return fileNameWithDimentions + this.photoParam.token;
+            fileName = fileName + this.photoParam.token;
+
+            return fileName;
         }
     }
 
@@ -366,14 +379,12 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
         // Get only approved photos (others, not personal)
         if (approvedOnly && this.user.id !== user.id) {
             user.photos = user.photos.filter(photo => photo.status === 1);
-
             if (user.photos.length === 0) {
                 return [{url: '../../../assets/media/users/default_' + user.gender + '.png'}];
             } else {
                 let photos = user.photos.map((photo, index) => {
-                    //user.photos[index].url = this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token;
-                    photo = {photo, url: this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token};
-                    console.log(photo);
+                    user.photos[index].url = this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token;
+                    photo = {url: this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token,...photo};
                     return photo;
                 });
                 return photos;
@@ -467,7 +478,7 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
         this.subscriptions.forEach(sb => sb.unsubscribe());
     }
 
-    loadHighlights(filterData) {
+    getHighlights(filterData) {
 
         return this.db.collection<any>('users', ref => {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
@@ -500,15 +511,11 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
 
             return query;
         })
-            .get()
+            .valueChanges()
             .pipe(
-                map((response: any) => {
+                map((results: any) => {
 
-                    let results = [];
-
-                    for (let item of response.docs) {
-                        results.push(item.data());
-                      }
+                    console.log(results);
 
                    /* if (filterData?.withPhoto) {
 
@@ -528,9 +535,11 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
                         this.highlights.lastKey = results[results.length - 1];
                     }
 
+
                     if (!this.highlights.lastKey) {
                         this.highlights.finishLoad = true;
                     }
+
 
                     if (filterData.ageRange) {
                         results = results.filter((el: any) => {
@@ -569,6 +578,7 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
 
                     return results.length > 0 ? results.filter(user => user && user.id !== this.user.id) : [];
                 }),
+                take(3)
             );
     }
 }

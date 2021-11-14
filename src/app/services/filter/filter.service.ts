@@ -12,8 +12,6 @@ export class FilterService {
 
     public set(filter) {
 
-        console.log(filter);
-
       localStorage.setItem(this.name, JSON.stringify(filter));
 
       return filter;

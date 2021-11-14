@@ -33,9 +33,7 @@ export class SettingsPage implements OnInit {
                 public alertController: AlertController,
                 public appVersion: AppVersion,
                 public userService: UserService) {
-
         this.userService.getUser();
-
     }
 
     ngOnInit() {
