@@ -11,7 +11,6 @@ import {FilterService} from '../../services/filter/filter.service';
 import {PhotosPage} from '../photos/photos.page';
 import {ProfilePage} from '../profile/profile.page';
 import { AuthService } from 'src/app/services/auth/auth.service';
-import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'app-highlights',
@@ -151,11 +150,13 @@ export class HighlightsPage implements OnInit, OnDestroy {
         return await modal.present();
     }
 
-    filter() {
-        //this.userService.highlights.lastKey = this.users[0];
-        this.userService.highlights.lastKey = 0;
+    async filter() {
+
+        this.userService.highlights.lastKey = undefined;
         this.userService.highlights.finishLoad = false;
+        this.userService.highlights.restResults = [];
         this.filterService.set(this.filterData);
+
         this.users = [];
         this.loadHighlights().pipe().subscribe(users => {
             users.forEach(user => this.users.push(user));
@@ -172,9 +173,19 @@ export class HighlightsPage implements OnInit, OnDestroy {
     loadData(event) {
         setTimeout(_ => {
             event.target.complete().then(_ => {
-                this.loadHighlights().subscribe(users => {
-                    users.forEach(user => this.users.push(user));
-                });
+                    this.loadHighlights().subscribe(users => {
+                        users.forEach(user => this.users.push(user));
+                        if(users.length === 0) {
+                            this.userService.highlights.restResults.forEach(user => {
+                                this.users.push(user);
+                            });
+
+                            this.users = [...new Map(this.users.map(item =>
+                                [item['id'], item])).values()];
+                            
+                        }
+                        
+                    });
             });
         }, 500);
     }

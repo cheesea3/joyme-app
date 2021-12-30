@@ -113,3 +113,9 @@ ion-button {
     transform: translateY(-50%);
   }
 }
+
+@media only screen and (max-width: 350px) {
+  .title.logo {
+    margin-top: 30vh;
+  }
+}

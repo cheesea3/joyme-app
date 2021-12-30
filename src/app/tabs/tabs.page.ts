@@ -3,6 +3,7 @@ import {Component, OnInit} from '@angular/core';
 import {CounterService} from '../services/counter/counter.service';
 import {UserService} from '../services/user/user.service';
 import {BehaviorSubject} from 'rxjs';
+import { AuthService } from '../services/auth/auth.service';
 
 export const counterSubject = new BehaviorSubject(0); // 0 is the initial value
 
@@ -21,6 +22,7 @@ export class TabsPage implements OnInit {
     constructor(
         public userService: UserService,
         public counterService: CounterService,
+        private authService: AuthService
     ) {
         
     }

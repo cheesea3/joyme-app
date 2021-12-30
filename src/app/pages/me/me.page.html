@@ -3,8 +3,8 @@
         <div class="section-upper">
             <div class="me-header" (click)="viewProfile(userService.user)">
                 <ion-avatar class="avatar">
-                    <img (error)="imgErrorHandler($event, userService.getMainPhoto(userService.user, 'm', false))"
-                         [src]="userService.getMainPhoto(userService.user, 'm', false)"/>
+                    <ion-img (error)="imgErrorHandler($event, userService.getMainPhoto(userService.user, 'm', false))"
+                         [src]="userService.getMainPhoto(userService.user, 'm', false)"></ion-img>
                 </ion-avatar>
                 <div>
                     <div class="me-title">{{userService.user?.username}} {{userService.getAge(userService.user?.birthday)}}

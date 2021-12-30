@@ -7,8 +7,7 @@ import {UserService} from '../../services/user/user.service';
 import {Subscription} from 'rxjs';
 import {first} from 'rxjs/operators';
 import {AuthService} from '../../services/auth/auth.service';
-import {Router} from '@angular/router';
-import {UniqueUsernameValidator} from '../../validators/unique-username.validator';
+//import {UniqueUsernameValidator} from '../../validators/unique-username.validator';
 import {PhotosPage} from '../photos/photos.page';
 import {BirthdayValidator} from '../../validators/birthday.validator';
 
@@ -52,7 +51,7 @@ export class RegisterStepsPage implements OnInit {
         private authService: AuthService,
         public toastController: ToastController,
         private modalCtrl: ModalController,
-        private uniqueUsernameValidator: UniqueUsernameValidator,
+        //private uniqueUsernameValidator: UniqueUsernameValidator,
         private birthdayValidator: BirthdayValidator,
     ) {
     }
@@ -257,7 +256,8 @@ export class RegisterStepsPage implements OnInit {
         this.user.status = +1;
         this.user.lastTimeActive = Date.now();
         this.user.isAdmin = false;
-        this.user.allPhotosApproved = true;
+        this.user.allPhotosApproved = 1;
+        this.user.mainPhotoApproved = 0;
         // this.user.ipAddress = this.ipAddress;
         this.user.accessToken = 'access-token-' + Math.random();
         this.user.refreshToken = 'refreshToken-token-' + Math.random();
@@ -374,31 +374,35 @@ export class RegisterStepsPage implements OnInit {
     }
 
     slideNext() {
-        this.currentIndexSlide++;
+        if(this.currentIndexSlide === 6) {
+            this.goToPhotos();
+        }else{
+            this.currentIndexSlide++;
 
-        this.initForm();
-
-        this.registrationForm = this.fb.group(
-            this.steps[this.currentIndexSlide]
-        );
-
-        setTimeout(_ => {
-            if (document.getElementsByTagName('ion-input')[0]) {
-                this.focusable.setFocus();
-            }
-
-            if (document.getElementsByTagName('ion-textarea')[0]) {
-                this.focusable.setFocus();
-            }
-
-            if (document.getElementsByTagName('ion-searchbar')[0]) {
-                this.focusable.setFocus();
-            }
-
-            if (document.getElementsByTagName('ion-datetime')[0]) {
-                document.getElementsByTagName('ion-datetime')[0].click();
-            }
-        }, 600);
+            this.initForm();
+    
+            this.registrationForm = this.fb.group(
+                this.steps[this.currentIndexSlide]
+            );
+    
+            setTimeout(_ => {
+                if (document.getElementsByTagName('ion-input')[0]) {
+                    this.focusable.setFocus();
+                }
+    
+                if (document.getElementsByTagName('ion-textarea')[0]) {
+                    this.focusable.setFocus();
+                }
+    
+                if (document.getElementsByTagName('ion-searchbar')[0]) {
+                    this.focusable.setFocus();
+                }
+    
+                if (document.getElementsByTagName('ion-datetime')[0]) {
+                    document.getElementsByTagName('ion-datetime')[0].click();
+                }
+            }, 600);
+        }
     }
 
     chooseCity(chosenItem: any) {

@@ -46,7 +46,7 @@
             ></image-cropper>
         </div>
         <div *ngIf="segment === 2" class="blur-photo">
-            <img [src]="croppedImage" alt=""/>
+            <ion-img [src]="croppedImage" alt=""></ion-img>
         </div>
         <div *ngIf="segment === 3" class="mask-photo">
             <angular-editor-fabric-js #canvas></angular-editor-fabric-js>
@@ -62,6 +62,7 @@
                             class="images-item" src="../../../assets/img/masks/3.png" alt=""></div>
                 </div>
             </div>
+            
         </div>
         <ion-buttons *ngIf="segment === 1">
             <ion-button (click)="rotateRight()">
@@ -129,6 +130,9 @@
         </ion-grid>
 
         <ion-grid *ngIf="userService.user.photos.length > 0">
+            <div class="warning-box">
+                <span class="icon"><ion-icon name="alert-circle-outline"></ion-icon></span><p>תמונות עירום,  מיניות או מבחינה אחרת מותרות באזור הפרטי בלבד. תמונות שלא יתאימו לקריטוריונים המפורטים ימחקו.</p>
+            </div>
             <h2>פרטי</h2>
             <ion-row>
                 <ion-col size="4" class="photo-item no-photo"

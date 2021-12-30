@@ -236,6 +236,7 @@ export class PhotosPage implements OnInit {
                 this.userService.user.photos = photos;
 
                 this.userService.user.allPhotosApproved = this.userService.allPhotosApproved();
+                this.userService.user.mainPhotoApproved = this.userService.mainPhotoApproved();
 
                 this.userService.update(this.userService.user).subscribe(() => {},
                 err => console.log(err),

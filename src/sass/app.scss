@@ -219,6 +219,15 @@ ion-toolbar .segment-custom {
   }
 }
 
+.warning-box{
+  display: flex;
+  align-items: center;
+  .icon {
+    color: #ff5722;
+    font-size: 2rem;
+    padding: 0 0.4rem;
+  }
+}
 
 .no-results {
   position: absolute;
