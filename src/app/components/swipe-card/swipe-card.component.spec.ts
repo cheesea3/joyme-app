@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { SwipeCardComponent } from './swipe-card.component';
@@ -7,7 +7,7 @@ describe('SwipeCardComponent', () => {
   let component: SwipeCardComponent;
   let fixture: ComponentFixture<SwipeCardComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SwipeCardComponent ],
       imports: [IonicModule.forRoot()]

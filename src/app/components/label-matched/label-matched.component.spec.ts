@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { LabelMatchedComponent } from './label-matched.component';
@@ -7,7 +7,7 @@ describe('LabelMatchedComponent', () => {
   let component: LabelMatchedComponent;
   let fixture: ComponentFixture<LabelMatchedComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ LabelMatchedComponent ],
       imports: [IonicModule.forRoot()]
