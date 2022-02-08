@@ -14,7 +14,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-slider/ngx-slider": "^2.0.3",
     "@angular/common": "~10.0.0",
     "@angular/core": "~10.0.0",
     "@angular/fire": "^6.1.4",
@@ -55,7 +54,6 @@
     "jetifier": "^1.6.8",
     "ng-inline-svg": "^10.1.0",
     "ng-lazyload-image": "^9.1.2",
-    "ngx-slider": "0.0.5",
     "rxjs": "~6.5.5",
     "swiper": "^6.8.4",
     "tslib": "^2.0.0",
