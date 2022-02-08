@@ -86,12 +86,15 @@ export class FcmService {
         try {
             this.data = data;
 
+            console.log(data);
+
+
             this.db.collection('push', ref => ref
-                .where('user_id', '==', data.receiver.id))
+                .where('user_id', '==', data.receiver?.id ? data.receiver.id : data.receiver_id))
                 .snapshotChanges().pipe(take(1)).subscribe(changes => {
 
                 changes.map((a: any) => {
-                    const id = a.payload.doc.id;
+                    const id = a.payload.doc?.id;
 
                     if (this.frequency(a.payload.doc.data().lastTimeUse) && this.options.push.active && this.options.push.messages) {
                         this.exec(a.payload.doc.data().token);

@@ -23,6 +23,9 @@ ion-tab-button {
 
     &.tab-selected {
       color: var(--color-button-boost) !important;
+      // ion-icon {
+      //   filter: drop-shadow(2px 4px 6px var(--color-button-boost)) drop-shadow(2px 4px 6px var(--color-button-boost)) drop-shadow(2px 4px 6px var(--color-button-boost));
+      // }
     }
 
   .rotate-45 {

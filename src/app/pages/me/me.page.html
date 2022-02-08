@@ -3,7 +3,7 @@
         <div class="section-upper">
             <div class="me-header" (click)="viewProfile(userService.user)">
                 <ion-avatar class="avatar">
-                    <ion-img (error)="imgErrorHandler($event, userService.getMainPhoto(userService.user, 'm', false))"
+                    <ion-img 
                          [src]="userService.getMainPhoto(userService.user, 'm', false)"></ion-img>
                 </ion-avatar>
                 <div>
@@ -59,8 +59,8 @@
             </ion-row>
         </div>
         <div class="section-lower has-oval">
-            <!--
-                    <div class="section-lower has-oval" (click)="viewSubscriptionGold()">
+           
+                    <!-- <div class="section-lower has-oval" (click)="viewSubscriptionGold()">
 
                         <div class="slide-intro">
                             <plus-intro *ngIf="showSlides"></plus-intro>
@@ -71,7 +71,8 @@
                                     class="button-custom text-primary button-tinder-plus">
                                 רכוש מנוי כעת
                             </ion-button>
-                        </div>-->
+                        </div>
+        </div> -->
         </div>
     </div>
 </ion-content>

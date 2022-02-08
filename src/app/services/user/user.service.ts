@@ -383,7 +383,8 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
             } else {
                 let photos = user.photos.map((photo, index) => {
                     //user.photos[index].url = this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token;
-                    photo = {photo, url: this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token};                    console.log(photo);
+                    photo = {photo, url: this.photoParam.baseUrl + photo.id + '_600x600' + this.photoParam.token};                    
+                    //console.log(photo);
                     return photo;
                 });
                 return photos;
@@ -519,8 +520,6 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
                             let allUsers = results;
                             results = allUsers.filter((user: any) => user.mainPhotoApproved === 1);
                             Array.prototype.push.apply(this.highlights.restResults,allUsers.filter((user: any) => user.mainPhotoApproved === 0)); 
-
-                            console.log(this.highlights.restResults);
                           }
 
                         //if (filterData?.online) {

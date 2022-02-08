@@ -31,8 +31,8 @@ export class HighlightsPage implements OnInit, OnDestroy {
     users = [];
     warningMsg = {active: false, message: ''};
     filterData = {
-        withPhoto: false,
-        online: true,
+        withPhoto: true,
+        online: false,
         preferences: [],
         area: '',
         status: 0,
@@ -61,7 +61,8 @@ export class HighlightsPage implements OnInit, OnDestroy {
     ngOnInit() {
 
         this.filterData = this.filterService.get(this.filterData);
-    
+        console.log(this.filterData);
+
         setTimeout(_ => {
             this.fcmService.initPush();
             this.userService.setOnline();
@@ -188,18 +189,6 @@ export class HighlightsPage implements OnInit, OnDestroy {
                     });
             });
         }, 500);
-    }
-
-    async viewProfile(profile) {
-        const modal = await this.modalCtrl.create({
-            component: ProfilePage,
-            componentProps: {
-                profile,
-            }
-
-        });
-        return await modal.present();
-        // this.navCtrl.navigateForward(`/profile/${user.id}`, user);
     }
 
     ngOnDestroy(): void {

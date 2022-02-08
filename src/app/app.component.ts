@@ -1,5 +1,5 @@
 import {Component, NgZone, ViewChild} from '@angular/core';
-import {IonRouterOutlet, Platform} from '@ionic/angular';
+import {AlertController, IonRouterOutlet, Platform} from '@ionic/angular';
 import {SplashScreen} from '@ionic-native/splash-screen/ngx';
 import {StatusBar} from '@ionic-native/status-bar/ngx';
 import {ThemeService} from './services/theme/theme.service';
@@ -7,6 +7,8 @@ import {RouterService} from './services/router.service';
 import {UserService} from './services/user/user.service';
 import {AuthService} from './services/auth/auth.service';
 import { UpdateAppService } from './services/update-app/update-app.service';
+import { Location } from '@angular/common';
+import { App } from '@capacitor/app';
 
 @Component({
     selector: 'app-root',
@@ -25,10 +27,14 @@ export class AppComponent {
         private routerService: RouterService,
         private authService: AuthService,
         public userService: UserService,
+        private _location: Location,
+        public alertController: AlertController,
         public updateAppService: UpdateAppService
        // private ngZone: NgZone,
     ) {
+
         this.initializeApp();
+
     }
 
     // tslint:disable-next-line:use-lifecycle-interface
@@ -42,6 +48,7 @@ export class AppComponent {
        // alert(this.userService.user.id);
 
         this.platform.ready().then(() => {
+          
             if(this.platform.is('android') || this.platform.is('ios')) {
                 this.updateAppService.checkForUpdate();
             }
@@ -57,7 +64,70 @@ export class AppComponent {
                 });
             });*/
         });
+     
+        document.addEventListener("backbutton", () => {
+          alert('App opened with URL:');
+        }, false);
+
+        App.addListener('backButton', () => {
+          alert('App opened with URL:');
+        });
+
+        this.platform.backButton.subscribeWithPriority(9999, (processNextHandler) => {
+            alert('Back press handler!');
+
+            if (this._location.isCurrentPathEqualTo('tabs/highlights')) {
+      
+              // Show Exit Alert!
+              console.log('Show Exit Alert!');
+              this.showExitConfirm();
+              processNextHandler();
+            } else {
+      
+              // Navigate to back page
+              console.log('Navigate to back page');
+              this._location.back();
+      
+            }
+          });
+
+      
+          this.platform.backButton.subscribeWithPriority(5, () => {
+            alert('Handler called to force close!');
+            this.alertController.getTop().then(r => {
+              if (r) {
+                navigator['app'].exitApp();
+              }
+            }).catch(e => {
+              alert(e);
+            })
+          });
+
+
         // this.themeService.restore();
         this.themeService.toggleDarkMode(true);
     }
+
+    showExitConfirm() {
+        this.alertController.create({
+          header: 'סיום אפליקציה',
+          message: 'האם אתה רוצה לסגור את האפליקציה?',
+          backdropDismiss: false,
+          buttons: [{
+            text: 'להישאר באפליקציה',
+            role: 'cancel',
+            handler: () => {
+              console.log('Application exit prevented!');
+            }
+          }, {
+            text: 'יציאה',
+            handler: () => {
+              navigator['app'].exitApp();
+            }
+          }]
+        })
+          .then(alert => {
+            alert.present();
+          });
+      }
 }

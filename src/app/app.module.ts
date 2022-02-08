@@ -14,7 +14,7 @@ import {AppComponent} from './app.component';
 import {SharedModule} from './components/sharedModule';
 import {SettingsPageModule} from './pages/settings/settings.module';
 import {ProfileEditPageModule} from './pages/profile-edit/profile-edit.module';
-import {MatchedModalPageModule} from './pages/matched-modal/matched-modal.module';
+//import {MatchedModalPageModule} from './pages/matched-modal/matched-modal.module';
 import {TinderGoldPageModule} from './pages/tinder-gold/tinder-gold.module';
 import {HttpClientModule} from '@angular/common/http';
 import {AngularFireModule} from '@angular/fire';
@@ -49,7 +49,7 @@ import { Market } from '@ionic-native/market/ngx';
     SharedModule,
     SettingsPageModule,
     ProfileEditPageModule,
-    MatchedModalPageModule,
+    //MatchedModalPageModule,
     TinderGoldPageModule,
   ],
   providers: [

@@ -44,7 +44,7 @@ export class ChatService extends TableService<UserModel> {
     }
 
     get(chatId): Observable<any> {
-        return this.db.collection('chats').doc(chatId).snapshotChanges()
+        return this.db.collection('chats',ref =>ref.limit(1)).doc(chatId).snapshotChanges()
             .pipe(
                 map(doc => {
                     // @ts-ignore
@@ -77,7 +77,7 @@ export class ChatService extends TableService<UserModel> {
         return ArrayHelper.valuesComparison(user1, user2);
     }
 
-    async sendMessage(chatId: string, content: string, userId: string, imageRequest: boolean = false): Promise<any> {
+    async sendMessage(chatId: string, content: string, userId: string, imageRequest: boolean = false, type =''): Promise<any> {
 
         const message = {
             uid: userId,
@@ -85,6 +85,7 @@ export class ChatService extends TableService<UserModel> {
             delivered: false,
             content,
             imageRequest,
+            type
         };
 
         const data = {
@@ -95,7 +96,19 @@ export class ChatService extends TableService<UserModel> {
             chatId
         };
 
-        this.http.post(this.API_URL + '/send', data).subscribe();
+        this.http.post(this.API_URL + '/send', data).subscribe(result => {
+            // Handle result
+            //alert(JSON.stringify(result));
+
+          },
+          error => {
+            //alert(JSON.stringify(error));
+          },
+          () => {
+            //alert('completed');
+            // 'onCompleted' callback.
+            // No errors, route to new page here
+          });
     }
 
     messagesNotReceived(messages, user) {
@@ -148,8 +161,12 @@ export class ChatService extends TableService<UserModel> {
                 return userDocs.length ? combineLatest(userDocs) : of([]);
             }),
             map(arr => {
-
-                arr.forEach(v => (joinKeys[(v as any).id] = v));
+                if(arr) {
+                    arr.forEach(v => {
+                            joinKeys[(v as any).id] = v;
+                        return v;
+                    });
+                }
                 chat.messages = chat.messages.map(v => {
                     const uid = this.userService.user.id === chat.uid1 ? chat.uid2 : chat.uid1;
                     return {...v, user: joinKeys[uid]};
@@ -172,8 +189,8 @@ export class ChatService extends TableService<UserModel> {
 
     getInbox(): Observable<any> {
 
-        const uid1Messages = this.db.collection('chats', ref => ref.where('uid1', '==', this.userService.user.id)).snapshotChanges();
-        const uid2Messages = this.db.collection('chats', ref => ref.where('uid2', '==', this.userService.user.id)).snapshotChanges();
+        const uid1Messages = this.db.collection('chats', ref => ref.where('uid1', '==', this.userService.user.id).limit(15)).snapshotChanges();
+        const uid2Messages = this.db.collection('chats', ref => ref.where('uid2', '==', this.userService.user.id).limit(15)).snapshotChanges();
 
         return combineLatest(uid1Messages, uid2Messages).pipe(
             map(([one, two]) => [...one, ...two])

@@ -22,7 +22,6 @@ export class MatchesPage implements OnInit, OnDestroy {
     public user;
     private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
-
     constructor(private navCtrl: NavController,
                 public modalCtrl: ModalController,
                 private routerService: RouterService,
@@ -30,12 +29,12 @@ export class MatchesPage implements OnInit, OnDestroy {
                 public paramsService: ParamsService,
                 public userService: UserService) {
                     let params = this.paramsService.getAll();
-                    if(params && params.sender) {
+                    if(params?.model && params.sender) {
                         this.viewProfile(params.sender);
                     }
         this.userService.getUser();
     }
-
+    
     loadData(event) {
         setTimeout(_ => {
             event.target.complete().then(res => {
@@ -54,6 +53,7 @@ export class MatchesPage implements OnInit, OnDestroy {
         this.inboxList = [];
         setTimeout(_ => {
             this.chatService.getInbox().subscribe(res => {
+                console.log(res);
                 this.isLoaded = true;
                 this.inboxList = res;
                 
@@ -91,6 +91,7 @@ export class MatchesPage implements OnInit, OnDestroy {
     async goToChat(id, profileId) {
         const modal = await this.modalCtrl.create({
             component: ChatPage,
+            keyboardClose: false,
             componentProps: {
                 chatId: id,
                 chatExists: true,

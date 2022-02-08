@@ -33,10 +33,6 @@ export class MePage implements OnInit, OnDestroy {
         this.userService.getUser();
     }
 
-    imgErrorHandler(e, src) {
-        e.target.src = src;
-    }
-
     ionViewDidEnter() {
         this.showSlides = true;
     }

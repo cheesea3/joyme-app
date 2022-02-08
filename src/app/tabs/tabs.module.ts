@@ -7,15 +7,16 @@ import { TabsPageRoutingModule } from './tabs-routing.module';
 
 import { TabsPage } from './tabs.page';
 import {CounterService} from '../services/counter/counter.service';
+import { PopupComponent } from '../components/popup/popup.component';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    TabsPageRoutingModule
+    TabsPageRoutingModule,
   ],
   // providers: [CounterService],
-  declarations: [TabsPage]
+  declarations: [TabsPage, PopupComponent]
 })
 export class TabsPageModule {}

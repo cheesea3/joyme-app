@@ -5,11 +5,11 @@ import { IonicModule } from '@ionic/angular';
 
 import { RandomAvatarComponent } from './random-avatar/random-avatar.component';
 import { ProfileImageSlidesComponent } from './profile-image-slides/profile-image-slides.component';
-import { SwipeCardComponent } from './swipe-card/swipe-card.component';
-import { PlusIntroComponent } from './plus-intro/plus-intro.component';
+//import { SwipeCardComponent } from './swipe-card/swipe-card.component';
+//import { PlusIntroComponent } from './plus-intro/plus-intro.component';
 import { PersonCardComponent } from './person-card/person-card.component';
-import { SpotifyHighlightsComponent } from './spotify-highlights/spotify-highlights.component';
-import { LabelMatchedComponent } from './label-matched/label-matched.component';
+//import { SpotifyHighlightsComponent } from './spotify-highlights/spotify-highlights.component';
+//import { LabelMatchedComponent } from './label-matched/label-matched.component';
 
 @NgModule({
   imports: [
@@ -20,21 +20,21 @@ import { LabelMatchedComponent } from './label-matched/label-matched.component';
   declarations: [
     RandomAvatarComponent,
     ProfileImageSlidesComponent,
-    SwipeCardComponent,
-    PlusIntroComponent,
+    //SwipeCardComponent,
+    //PlusIntroComponent,
     PersonCardComponent,
-    SpotifyHighlightsComponent,
-    LabelMatchedComponent,
+    //SpotifyHighlightsComponent,
+    //LabelMatchedComponent,
   ],
   providers: [],
   exports: [
     RandomAvatarComponent,
     ProfileImageSlidesComponent,
-    SwipeCardComponent,
-    PlusIntroComponent,
+   // SwipeCardComponent,
+   // PlusIntroComponent,
     PersonCardComponent,
-    SpotifyHighlightsComponent,
-    LabelMatchedComponent,
+    //SpotifyHighlightsComponent,
+    //LabelMatchedComponent,
   ]
 })
 

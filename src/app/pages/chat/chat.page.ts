@@ -9,6 +9,8 @@ import {CounterService} from '../../services/counter/counter.service';
 import {FcmService} from '../../services/fcm/fcm.service';
 import {ProfilePage} from '../profile/profile.page';
 import { take } from 'rxjs/operators';
+import {Camera, CameraOptions} from '@ionic-native/camera/ngx';
+import { ImageModalPage } from 'src/app/image-modal/image-modal.page';
 
 @Component({
     selector: 'app-chat',
@@ -23,7 +25,12 @@ export class ChatPage implements OnInit {
     newMsg: string;
     chatId: string;
     messages: any[];
-    typingMessage = '';
+    errMessage: string;
+    updatedDialogue = true;
+
+    //typingMessage = '';
+    typeMessage = '';
+    temporaryMessage = '';
     imageRequestMessage = [];
     interlocutorId = '';
     blockedMessage = '';
@@ -41,8 +48,11 @@ export class ChatPage implements OnInit {
         public toastController: ToastController,
         public fcmService: FcmService,
         public navParams: NavParams,
+        private camera: Camera,
+
     ) {
         this.chatId = this.navParams.get('chatId');
+        console.log(this.chatId);
         this.dialogueExists = this.navParams.get('chatExists');
         this.interlocutorId = this.navParams.get('profileId');
 
@@ -65,6 +75,48 @@ export class ChatPage implements OnInit {
 
     getListData(type, userId) {
         return this.userService.getListData(type, userId);
+    }
+
+    async openPreview(img) {
+        console.log(img);
+        const modal = await this.modalCtrl.create({
+            component: ImageModalPage,
+            componentProps: {
+                img
+            },
+            cssClass: 'transparent-modal'
+        });
+
+        modal.present();
+
+    }
+
+    chooseImage() {
+
+       // const sourceType = this.camera.PictureSourceType.CAMERA;
+
+        const options: CameraOptions = {
+            quality: 100,
+            destinationType: this.camera.DestinationType.DATA_URL,
+            encodingType: this.camera.EncodingType.JPEG,
+            mediaType: this.camera.MediaType.PICTURE,
+            correctOrientation: true,
+            sourceType: this.camera.PictureSourceType.PHOTOLIBRARY
+        };
+        this.camera.getPicture(options).then((imageData) => {
+       
+            //alert(JSON.stringify(imageData))
+            this.newMsg = 'data:image/jpeg;base64,' + imageData;
+            this.typeMessage = 'image';
+            // this.imageBase64 = 'data:image/jpeg;base64,' + imageData;
+            // this.imageChangedEvent = this.imageBase64;
+            // this.imgLoaded = true;
+            this.submit();
+        }, (err) => {
+            // Handle error
+            
+            //alert(JSON.stringify(err))
+        });
     }
 
     async imageConfirmation() {
@@ -121,6 +173,9 @@ export class ChatPage implements OnInit {
 
         this.subscription = this.chat$.subscribe(chat => {
 
+            this.updatedDialogue = true;
+           // this.newMsg = '';
+
             this.fcmService.getOptionsByUserId(this.interlocutorId);
 
             if (chat.messages.length > 0) {
@@ -138,15 +193,26 @@ export class ChatPage implements OnInit {
                     message.time = DateHelper.getCurrentTime(message.createdAt);
                     const date = DateHelper.formatMovementDate(message.createdAt, 'he-IL');
                     message.date = date;
+                    message.chatDate = message.date;
 
-                    message.date =  (i === 0 || (i > 0 && (message.date !== chat.messages[i - 1].date))) ? date : '';
-                    
+                    message.date =  i === 0 || (i > 0 && (message.date !== chat.messages[i - 1].chatDate)) ? date : '';
+
+                    if(message.date && message.date !='היום') { 
+                        message.date = message.date.split(".");
+                        message.date = this.addZeroes(message.date[0]) + '.' + this.addZeroes(message.date[1]) + '.' + message.date[2]
+                    }
+
                     return message;
                 })
             }
-            this.scrollToBottom(null, true);
+            this.scrollToBottom(500, true);
         });
     }
+
+    addZeroes(num) {
+            if (num<10) {num = "0" + num};  // add zero in front of numbers < 10
+            return num;
+      }
 
     async viewProfile(profile) {
         const modal = await this.modalCtrl.create({
@@ -178,13 +244,26 @@ export class ChatPage implements OnInit {
     }
 
     submit() {
-
+        
         if (!this.newMsg) {
             return;
         }
 
-        this.chatService.sendMessage(this.chatId, this.newMsg, this.userService.user.id).then(_ => {
+        if (this.newMsg.length > 300) {
 
+            this.errMessage = 'הודעה אחת צריכה להכיל לא יותר מ-300 תווים. ההודעה הנוכחית כוללת ' + this.newMsg.length + ' תווים';
+            this.presentToast(this.errMessage);
+            return;
+        }
+
+        this.updatedDialogue = false;
+        this.temporaryMessage = this.newMsg; 
+
+        setTimeout(() => {
+            this.scrollToBottom();
+        });
+
+        this.chatService.sendMessage(this.chatId, this.newMsg, this.userService.user.id, false, this.typeMessage).then(_ => {
             if (!this.dialogueExists) {
                 this.chatService.setDialogue(this.chatId).subscribe(res => {
                     this.getDialogue();
@@ -201,17 +280,18 @@ export class ChatPage implements OnInit {
             // Set counter for unread messages
             this.counterService.setByUserId(this.chatService.interlocutor.id, -1, 'newMessages');
 
-            setTimeout(() => {
-                this.scrollToBottom();
-            }, 300);
+             setTimeout(() => {
+                 this.scrollToBottom();
+             }, 300);
         });
         this.newMsg = '';
+        //this.typeMessage = '';
     }
 
     async presentToast(message: string) {
         const toast = await this.toastController.create({
             message,
-            duration: 2000
+            duration: 3000
         });
         toast.present();
     }

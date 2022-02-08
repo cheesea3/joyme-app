@@ -71,6 +71,10 @@ const routes: Routes = [
         path: 'page/:slug',
         loadChildren: () => import('./pages/page/page.module').then(m => m.PagePageModule)
     },
+  {
+    path: 'image-modal',
+    loadChildren: () => import('./image-modal/image-modal.module').then( m => m.ImageModalPageModule)
+  },
 ];
 
 @NgModule({
