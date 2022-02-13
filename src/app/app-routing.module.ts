@@ -64,7 +64,6 @@ const routes: Routes = [
     },
     {
         path: 'photos',
-        // component: PhotosPage
         loadChildren: () => import('./pages/photos/photos.module').then(m => m.PhotosPageModule)
     },
     {
@@ -73,7 +72,7 @@ const routes: Routes = [
     },
   {
     path: 'image-modal',
-    loadChildren: () => import('./image-modal/image-modal.module').then( m => m.ImageModalPageModule)
+    loadChildren: () => import('./components/image-modal/image-modal.module').then( m => m.ImageModalPageModule)
   },
 ];
 

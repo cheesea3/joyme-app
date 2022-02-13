@@ -19,10 +19,12 @@ export class PersonCardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.user.previewPhoto = this.userService.getMainPhoto(this.user,'m');
+    //this.user.previewPhoto = this.userService.getMainPhoto(this.user,'m');
   }
 
   async viewProfile() {
+    console.log(this.user.previewPhoto);
+
     const modal = await this.modalCtrl.create({
         component: ProfilePage,
         componentProps: {

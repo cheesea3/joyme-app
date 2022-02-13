@@ -3,8 +3,7 @@
         <div class="section-upper">
             <div class="me-header" (click)="viewProfile(userService.user)">
                 <ion-avatar class="avatar">
-                    <ion-img 
-                         [src]="userService.getMainPhoto(userService.user, 'm', false)"></ion-img>
+                    <img [lazyLoad]="userService.getMainPhoto(userService.user, 'l', false)" [defaultImage]="userService.getDefaultPhotoPlaceholder(userService.user)">
                 </ion-avatar>
                 <div>
                     <div class="me-title">{{userService.user?.username}} {{userService.getAge(userService.user?.birthday)}}

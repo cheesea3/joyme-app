@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 
+
 @Component({
     selector: 'plus-intro',
     templateUrl: './plus-intro.component.html',
@@ -14,6 +15,7 @@ export class PlusIntroComponent implements OnInit {
 
     constructor() {
     }
+
 
     ngOnInit() {
         this.items = [

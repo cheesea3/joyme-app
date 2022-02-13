@@ -1,8 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../../services/user/user.service';
-import {Camera, CameraOptions} from '@ionic-native/camera/ngx';
+import {Camera, CameraOptions} from '@awesome-cordova-plugins/camera/ngx';
 import {Crop} from '@ionic-native/crop/ngx';
-import {File} from '@ionic-native/file/ngx';
+import { File } from '@awesome-cordova-plugins/file/ngx';
 import {ActionSheetController, AlertController, ModalController, NavController, ToastController} from '@ionic/angular';
 import {FileUploadService} from '../../services/file-upload/file-upload.service';
 import {ImageCroppedEvent, ImageTransform} from '../../interfaces/image-cropper';
@@ -28,6 +28,7 @@ export class PhotosPage implements OnInit {
     public isLoading = false;
     public containWithinAspectRatio = false;
     public showCropper = false;
+    public defaultImage = '';
     public imgLoaded = false;
     public uploadProgress;
     public isPrivateSelectedImage: boolean = false
@@ -128,6 +129,7 @@ export class PhotosPage implements OnInit {
 
     imageCropped(event: ImageCroppedEvent) {
         this.croppedImage = event.base64;
+
     }
 
     done() {
@@ -152,11 +154,9 @@ export class PhotosPage implements OnInit {
         this.canvas.getImgPolaroid(event);
     }
 
-    imgErrorHandler(e, src) {
-        e.target.src = src;
-    }
-
     public rasterize() {
+        this.defaultImage = '';
+        this.defaultImage = this.croppedImage;
         let src = '';
         if (this.segment === 3) {
             src = this.canvas.rasterize();
@@ -203,17 +203,16 @@ export class PhotosPage implements OnInit {
                     this.privatePhotos.push(newImage): this.publicPhotos.push(newImage)
        
                 this.userService.user.photos = photos;
-
                 this.userService.user.allPhotosApproved = this.userService.allPhotosApproved();
                 this.userService.user.mainPhotoApproved = this.userService.mainPhotoApproved();
+                this.uploadingProcess = false;
+                this.cancelUpload();
 
                 this.userService.update(this.userService.user).subscribe(() => {},
                 err => console.log(err),
                 () => {
                     setTimeout(() =>{
-                        this.uploadingProcess = false;
                         this.userService.user.photos = photos;
-                        this.cancelUpload();
                     },900)
                 });
 

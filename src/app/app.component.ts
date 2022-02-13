@@ -64,17 +64,12 @@ export class AppComponent {
                 });
             });*/
         });
-     
-        document.addEventListener("backbutton", () => {
-          alert('App opened with URL:');
-        }, false);
 
-        App.addListener('backButton', () => {
-          alert('App opened with URL:');
-        });
+        
+        /*this.platform.backButton.subscribeWithPriority(9999, (processNextHandler) => {
+           // alert('Back press handler!');
 
-        this.platform.backButton.subscribeWithPriority(9999, (processNextHandler) => {
-            alert('Back press handler!');
+            alert(JSON.stringify(this._location));
 
             if (this._location.isCurrentPathEqualTo('tabs/highlights')) {
       
@@ -89,19 +84,7 @@ export class AppComponent {
               this._location.back();
       
             }
-          });
-
-      
-          this.platform.backButton.subscribeWithPriority(5, () => {
-            alert('Handler called to force close!');
-            this.alertController.getTop().then(r => {
-              if (r) {
-                navigator['app'].exitApp();
-              }
-            }).catch(e => {
-              alert(e);
-            })
-          });
+          });*/
 
 
         // this.themeService.restore();

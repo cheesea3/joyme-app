@@ -23,7 +23,6 @@ export class ProfileImageSlidesComponent implements OnInit {
     @Output() onChange = new EventEmitter();
     @ViewChild('profileImages', {static: false}) slides: IonSlides;
     imageRequest = {result: {accepted: false}, empty: true}; 
-
     constructor(
         private taptic: TapticEngine, 
         public authService: AuthService, 
@@ -52,7 +51,7 @@ export class ProfileImageSlidesComponent implements OnInit {
                 this.chatService.sendMessage(res.chat.id, 'בקשה לאישור תמונה', this.userService.user.id, true).then(res => {
                     // Set counter for unread messages
                     this.counterService.setByUserId(this.chatService.interlocutor.id, +1, 'newMessages');
-                    const pushData = {title: 'JoyMe', body: 'קיבלת בקשה לאישור תמונות', receiver_id: this.chatService.interlocutor.id};
+                    const pushData = {title: 'JoyMe', body: 'קיבלת בקשה לאישור תמונות', receiver_id: this.chatService.interlocutor.id, page: '/tabs/highlights'};
                     // Sending push only to active users
                     if (this.chatService.interlocutor.status === 1) {
                         this.fcmService.sendPushMessage(pushData);

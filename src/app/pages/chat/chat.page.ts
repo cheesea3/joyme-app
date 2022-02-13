@@ -9,8 +9,9 @@ import {CounterService} from '../../services/counter/counter.service';
 import {FcmService} from '../../services/fcm/fcm.service';
 import {ProfilePage} from '../profile/profile.page';
 import { take } from 'rxjs/operators';
-import {Camera, CameraOptions} from '@ionic-native/camera/ngx';
-import { ImageModalPage } from 'src/app/image-modal/image-modal.page';
+import {Camera, CameraOptions} from '@awesome-cordova-plugins/camera/ngx';
+
+import { ImageModalPage } from 'src/app/components/image-modal/image-modal.page';
 
 @Component({
     selector: 'app-chat',
@@ -132,7 +133,7 @@ export class ChatPage implements OnInit {
                      pushData = {
                          title: 'JoyMe', 
                          body: 'בקשת התמונה נדחתה ❌', 
-                         page: 'tabs/highlights', 
+                         page: '/tabs/matches', 
                          modal: true,
                          receiver: this.chatService.interlocutor,
                          sender: this.userService.user
@@ -149,7 +150,7 @@ export class ChatPage implements OnInit {
                      pushData = {
                          title: 'JoyMe', 
                          body: 'בקשת התמונה התקבלה ✅', 
-                         page: 'tabs/highlights',
+                         page: '/tabs/matches',
                          modal: true,
                          receiver: this.chatService.interlocutor,
                          sender: this.userService.user
@@ -243,16 +244,18 @@ export class ChatPage implements OnInit {
         this.userService.getUser();
     }
 
+    validateMessage() {
+        if (this.newMsg.length > 300) {
+            this.newMsg = this.newMsg.substring(0, this.newMsg.length - 1);
+            this.errMessage = 'הודעה אחת צריכה להכיל לא יותר מ-300 תווים. ההודעה הנוכחית כוללת ' + this.newMsg.length + ' תווים';
+            this.presentToast(this.errMessage);
+            return;
+        }
+    }
+ 
     submit() {
         
         if (!this.newMsg) {
-            return;
-        }
-
-        if (this.newMsg.length > 300) {
-
-            this.errMessage = 'הודעה אחת צריכה להכיל לא יותר מ-300 תווים. ההודעה הנוכחית כוללת ' + this.newMsg.length + ' תווים';
-            this.presentToast(this.errMessage);
             return;
         }
 
@@ -270,7 +273,7 @@ export class ChatPage implements OnInit {
                 });
             }
 
-            const pushData = {title: 'JoyMe', body: 'קיבלת הודעה חדשה', page: 'tabs/matches', modal: false, sender: this.userService.user, receiver: this.chatService.interlocutor};
+            const pushData = {title: 'JoyMe', body: 'קיבלת הודעה חדשה', page: '/tabs/matches', modal: false, sender: this.userService.user, receiver: this.chatService.interlocutor};
 
             // Sending push only to active users
             if (this.chatService.interlocutor.status === 1) {

@@ -404,6 +404,10 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
         }
     }
 
+    public getDefaultPhotoPlaceholder(user):string {
+        return '../../../assets/media/users/default_' + user.gender + '.png'
+    }
+
     public setAsMainPhoto(photo): void {
         this.user.photos.map(el => {
             el.main = el.url === photo.url;
@@ -557,8 +561,6 @@ export class UserService extends TableService<UserModel> implements OnDestroy {
                                 }
                             });
                         }
-
-    
                         return results.length > 0 ? results.filter(user => user && user.id !== this.user.id) : [];
                     }),
                 );

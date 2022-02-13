@@ -66,7 +66,6 @@ export class HighlightsPage implements OnInit, OnDestroy {
         setTimeout(_ => {
             this.fcmService.initPush();
             this.userService.setOnline();
-
             this.loadHighlights().subscribe(users => {
                 this.isLoading = false;
                 users.forEach((user: any) => this.users.push(user));

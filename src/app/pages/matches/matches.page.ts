@@ -29,7 +29,7 @@ export class MatchesPage implements OnInit, OnDestroy {
                 public paramsService: ParamsService,
                 public userService: UserService) {
                     let params = this.paramsService.getAll();
-                    if(params?.model && params.sender) {
+                    if(params?.modal && params.sender) {
                         this.viewProfile(params.sender);
                     }
         this.userService.getUser();

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header *ngIf="!imgLoaded">
     <ion-toolbar>
         <ion-buttons slot="start">
             <ion-back-button></ion-back-button>
@@ -30,8 +30,8 @@
                     [maintainAspectRatio]="true"
                     [containWithinAspectRatio]="containWithinAspectRatio"
                     [aspectRatio]="1"
-                    [resizeToWidth]="590"
-                    [cropperMinWidth]="590"
+                    [resizeToWidth]="600"
+                    [cropperMinWidth]="600"
                     [imageQuality]="100"
                     [onlyScaleDown]="true"
                     [roundCropper]="false"
@@ -102,15 +102,11 @@
             <ion-row>
                 <ion-col size="4" class="photo-item no-photo"
                          *ngFor="let i of [0,1,2,3,4,5]">
-                    <div *ngIf="publicPhotos[i]" (error)="imgErrorHandler($event, fileUploadService.getBaseUrl(publicPhotos[i].url))" (click)="selectImage($event, false, publicPhotos[i])"
+                    <div *ngIf="publicPhotos[i]" (click)="selectImage($event, false, publicPhotos[i])"
                          class="photo-image background-img select-image"
-                         [style.backgroundImage]="'url(' + fileUploadService.getBaseUrl(publicPhotos[i].url)  +')'">
+                         [defaultImage]="defaultImage"
+                         [lazyLoad]="fileUploadService.getBaseUrl(publicPhotos[i].url)">
                         <div class="label-main" *ngIf="publicPhotos[i].main">ראשי</div>
-                        <div class="label-rejected" *ngIf="publicPhotos[i].status === 2">
-                            <ion-icon
-                                    name="close-circle-outline"></ion-icon>
-                        </div>
-
                         <ion-icon *ngIf="publicPhotos[i].status === 0" class="status status-waiting"
                                   name="timer-outline"></ion-icon>
                     </div>
@@ -137,15 +133,11 @@
             <ion-row>
                 <ion-col size="4" class="photo-item no-photo"
                          *ngFor="let i of [0,1,2,3,4,5]" [attr.data-index]="i">
-                    <div *ngIf="privatePhotos[i]" (error)="imgErrorHandler($event, fileUploadService.getBaseUrl(privatePhotos[i].url))" (click)="selectImage($event, false, privatePhotos[i])"
+                    <div *ngIf="privatePhotos[i]" (click)="selectImage($event, false, privatePhotos[i])"
                          class="photo-image background-img select-image"
-                         [style.backgroundImage]="'url(' + fileUploadService.getBaseUrl(privatePhotos[i].url)  +')'"
+                         [defaultImage]="defaultImage"
+                         [lazyLoad]="fileUploadService.getBaseUrl(privatePhotos[i].url)"
                     >
-                        <div class="label-rejected" *ngIf="privatePhotos[i].status === 2">
-                            <ion-icon
-                                    name="close-circle-outline"></ion-icon>
-                        </div>
-
                         <ion-icon *ngIf="privatePhotos[i].status === 0" class="status status-waiting"
                                   name="timer-outline"></ion-icon>
                     </div>

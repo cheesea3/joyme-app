@@ -96,12 +96,13 @@ export class FcmService {
                 changes.map((a: any) => {
                     const id = a.payload.doc?.id;
 
-                    if (this.frequency(a.payload.doc.data().lastTimeUse) && this.options.push.active && this.options.push.messages) {
+                    //if (this.frequency(a.payload.doc.data().lastTimeUse) && this.options.push.active && this.options.push.messages) {
+                        console.log('tiken: ' + a.payload.doc.data().token);
                         this.exec(a.payload.doc.data().token);
                         this.db.collection('push').doc(id).set({
                             lastTimeUse: Date.now()
                         },{merge: true});
-                    }
+                    //}
                 });
             });
         } catch (e) {
@@ -139,8 +140,7 @@ export class FcmService {
             })
         };
 
-        this.http.post('https://fcm.googleapis.com/fcm/send', newBody, httpOptions).subscribe(res => {
-        });
+        this.http.post('https://fcm.googleapis.com/fcm/send', newBody, httpOptions).subscribe(res => console.log(res),err => console.error(err));
     }
 
     private registerPush() {
@@ -149,8 +149,7 @@ export class FcmService {
                 PushNotifications.register();
             }
         });
-
-
+        
         // On success, we should be able to receive notifications
         PushNotifications.addListener('registration',
             (token: Token) => {
@@ -180,8 +179,7 @@ export class FcmService {
                  const data = notification.notification.data;
                  data.sender = JSON.parse(data.sender);
                  this.paramsService.set(data);
-                 
-                this.router.navigateByUrl('/tabs/matches').then(_ => {});
+                this.router.navigateByUrl(data.page).then(_ => {});
             }
         );
     }

@@ -72,8 +72,7 @@
 <ion-footer *ngIf="!blockedMessage">
     <ion-toolbar class="toolbar-no-border">
         <div class="form">
-            <ion-textarea autofocus placeholder="הודעה" rows="1" [(ngModel)]="newMsg"></ion-textarea>
-            <!-- <input  (keydown.enter)="submit()"> -->
+            <ion-textarea autofocus placeholder="הודעה" rows="1" (ionChange)="validateMessage()" [(ngModel)]="newMsg"></ion-textarea>
             <!-- <div (click)="chooseImage()" class="btn-img-send">
                 <ion-icon name="image-outline"></ion-icon>
             </div> -->

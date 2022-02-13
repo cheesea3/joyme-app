@@ -5,7 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { MePage } from './me.page';
 import { SharedModule } from '../../components/sharedModule';
-//import { LazyLoadImageModule } from 'ng-lazyload-image'; // <-- import it
+import { LazyLoadImageModule } from 'ng-lazyload-image'; // <-- import it
 
 const routes: Routes = [
   {
@@ -21,7 +21,7 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
     SharedModule,
-    //LazyLoadImageModule,
+    LazyLoadImageModule,
   ],
   declarations: [MePage]
 })

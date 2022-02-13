@@ -37,3 +37,10 @@
     right: 8px;
   }
 }
+
+
+@media(min-width: 768px) {
+  .person-card {
+    padding-top: 320px;
+  }
+}

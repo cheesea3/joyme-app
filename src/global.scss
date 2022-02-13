@@ -32,7 +32,8 @@
 @import './sass/dark.scss';
 
 //@import '~@ionic/swiper/swiper.scss';
-@import "~swiper/swiper.scss";
+//@import '~swiper/scss';
+//@import '~@ionic/angular/css/ionic-swiper';
 
 .full-size-image {
     .swiper-wrapper {
@@ -49,3 +50,18 @@
         backdrop-filter: blur(12px);
     }
 }
+
+
+.ng-lazyloaded {
+    animation: fadein .8s;
+  }
+  
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+  
+    to {
+      opacity: 1;
+    }
+  }
