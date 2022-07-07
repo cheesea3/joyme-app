@@ -1,0 +1,1 @@
+Click the bottom button put in any number (doesnt matter), any length, in the first input then hit the button for submission. Then type in '12345' without the single quotes for the verify otp input that follows to verify the 'dummy acc' and view the ui
